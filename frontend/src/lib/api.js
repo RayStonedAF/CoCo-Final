@@ -43,6 +43,6 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ messages, userName })
     });
-    return response.reply || '';
+    return response;
   }
 };

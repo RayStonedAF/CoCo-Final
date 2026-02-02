@@ -9,6 +9,7 @@ const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama3';
  */
 export async function callOllamaChat(messages) {
   try {
+    console.log(`[Ollama] Calling ${OLLAMA_BASE_URL}/api/chat with model ${OLLAMA_MODEL}`);
     const response = await axios.post(
       `${OLLAMA_BASE_URL}/api/chat`,
       {
@@ -21,9 +22,13 @@ export async function callOllamaChat(messages) {
       }
     );
 
-    return response.data.message?.content || '';
+    const content = response.data.message?.content || '';
+    console.log(`[Ollama] Success: ${content.substring(0, 100)}...`);
+    return content;
   } catch (error) {
     console.error('Error calling Ollama chat:', error.message);
+    console.error('Ollama Base URL:', OLLAMA_BASE_URL);
+    console.error('Ollama Model:', OLLAMA_MODEL);
     return null;
   }
 }
@@ -76,9 +81,11 @@ export async function chatWithCoco(messages, userName = 'friend') {
     });
   }
 
+  console.log(`[CoCo Chat] Sending ${messages.length} messages to Ollama (${OLLAMA_MODEL})`);
   const reply = await callOllamaChat(messages);
 
   if (!reply) {
+    console.warn(`[CoCo Chat] Ollama returned no response. Messages sent: ${JSON.stringify(messages)}`);
     // Fallback if Ollama unavailable
     const lastMessage = messages[messages.length - 1]?.content || '';
     if (lastMessage.toLowerCase().includes('help')) {
@@ -87,5 +94,6 @@ export async function chatWithCoco(messages, userName = 'friend') {
     return `That sounds interesting! Keep exploring great recipes and let me know how I can help, ${userName}!`;
   }
 
+  console.log(`[CoCo Chat] Ollama responded: ${reply.substring(0, 100)}...`);
   return reply;
 }

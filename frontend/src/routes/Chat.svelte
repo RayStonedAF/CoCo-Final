@@ -43,11 +43,17 @@
     try {
       loading = true;
 
+      // Build messages array with system context (like reference code)
+      const messagesToSend = [
+        {
+          role: 'system',
+          content: `You are CoCo, a friendly and encouraging cooking companion AI. You help ${userName} find recipes, answer cooking questions, and provide encouragement. Keep responses concise and friendly. End with a cooking tip or encouragement when appropriate.`
+        },
+        ...messages.map(m => ({ role: m.role, content: m.content }))
+      ];
+
       // Call backend
-      const response = await api.chatWithCoco(
-        messages.map(m => ({ role: m.role, content: m.content })),
-        userName
-      );
+      const response = await api.chatWithCoco(messagesToSend, userName);
 
       // Add assistant response
       const assistantMsg = response.reply || 'I\'m not sure how to respond to that.';

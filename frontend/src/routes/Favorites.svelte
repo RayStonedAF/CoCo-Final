@@ -110,21 +110,41 @@
     background: #e8c8a0;
   }
 
+  /* GRID */
   .favorites-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
 
+  /* CARD BUTTON RESET + LAYOUT */
   .favorite-tile {
     cursor: pointer;
-    border-radius: 0.75rem;
+    border-radius: 0.9rem;
     overflow: hidden;
     background: #1a1410;
     border: 1px solid #6b4d3d;
-    transition: transform 0.2s, box-shadow 0.2s;
+
     padding: 0;
     text-align: left;
+
+    /* important: make it behave like a card */
+    display: flex;
+    flex-direction: column;
+
+    /* make all cards same visual height inside grid rows */
+    height: 100%;
+
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  /* remove button weird defaults */
+  .favorite-tile {
+    appearance: none;
+    -webkit-appearance: none;
+    border: 1px solid #6b4d3d;
+    background: #1a1410;
+    color: inherit;
   }
 
   .favorite-tile:hover {
@@ -132,24 +152,46 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
   }
 
-  .favorite-tile img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    display: block;
+  .favorite-tile:focus-visible {
+    outline: 2px solid #d4a574;
+    outline-offset: 2px;
   }
 
+  /* IMAGE: fixed consistent area */
+  .favorite-tile img {
+    width: 100%;
+    aspect-ratio: 4 / 3;     /* <-- key: consistent image box */
+    object-fit: cover;
+    display: block;
+    background: #0f0c09;     /* avoids “flash” if image loads slow */
+  }
+
+  /* TITLE: always sits under image with consistent spacing */
   .favorite-tile h3 {
-    padding: 0.75rem;
     margin: 0;
+    padding: 0.8rem 0.85rem 0.95rem;
     font-size: 0.95rem;
     text-align: center;
     color: #f5f1e8;
+    line-height: 1.2;
+
+    /* Keep titles from changing card height too much */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;   /* max 2 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: calc(2 * 1.2em); /* ensures consistent title block height */
   }
 
   @media (min-width: 768px) {
     .favorites-grid {
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .favorite-tile h3 {
+      font-size: 1rem;
     }
   }
 </style>
+
