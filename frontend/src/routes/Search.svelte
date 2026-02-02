@@ -14,6 +14,7 @@
   let searched = false;
 
   async function handleSearch(query) {
+    searchQuery = query;
     if (!query || query.trim() === '') {
       recipes = [];
       searched = false;
@@ -42,7 +43,7 @@
 
 <div class="page-container">
   <h1>Search for Recipes</h1>
-  <SearchBar {searchQuery} onSearch={handleSearch} />
+  <SearchBar value={searchQuery} onSearch={handleSearch} />
 
   {#if error}
     <ErrorBanner message={error} onClose={handleCloseError} />

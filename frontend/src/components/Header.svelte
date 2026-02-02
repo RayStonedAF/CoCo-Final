@@ -17,7 +17,7 @@
   </div>
   <div class="header-icons">
     <button on:click={() => goto('/search')} class="icon-button" title="Search">
-      🔍
+      <img src="/search.svg" alt="Search" class="icon-svg" />
     </button>
     <button on:click={() => goto('/profile')} class="icon-button" title="Profile">
       👤
@@ -66,9 +66,17 @@
     padding: 0.5rem;
     border-radius: 50%;
     transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .icon-button:hover {
     background: rgba(255, 255, 255, 0.1);
+  }
+
+  .icon-svg {
+    width: 24px;
+    height: 24px;
   }
 </style>

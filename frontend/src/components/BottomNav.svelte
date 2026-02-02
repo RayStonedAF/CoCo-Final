@@ -16,7 +16,7 @@
     class:active={isActive('/home')}
     title="Home"
   >
-    🏠
+    <img src="/home.svg" alt="Home" class="icon-svg" />
   </button>
   <button
     on:click={() => goto('/chat')}
@@ -31,7 +31,7 @@
     class:active={isActive('/favorites')}
     title="Favorites"
   >
-    ❤️
+    <img src="/heart.svg" alt="Favorites" class="icon-svg" />
   </button>
 </nav>
 
@@ -56,10 +56,11 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    padding: 0.75rem;
+    padding: 0;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     transition: all 0.3s;
-    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -70,7 +71,12 @@
   }
 
   .nav-item.active {
-    background: rgba(212, 165, 116, 0.3);
+    background: rgba(46, 125, 50, 0.4);
+  }
+
+  .icon-svg {
+    width: 24px;
+    height: 24px;
   }
 
   .nav-item.center {

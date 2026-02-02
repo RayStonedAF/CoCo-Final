@@ -33,6 +33,7 @@
       const recipePromises = recipesToFetch.map(id => api.getRecipeById(id));
       const recipes = await Promise.all(recipePromises);
       const validRecipes = recipes.filter(Boolean);
+      const recipeIds = new Set(validRecipes.map(r => r.id)); // Track IDs to avoid duplicates
 
       // Generate recommendations until we have exactly 5
       while (validRecipes.length < 5) {
@@ -43,15 +44,20 @@
           // Search for similar recipes by category
           const similar = await api.searchRecipes(baseFavorite.category);
           if (similar && similar.length > 0) {
-            // Pick a random similar recipe
-            const randomSimilar = similar[Math.floor(Math.random() * similar.length)];
+            // Find a random similar recipe that we don't already have
+            let attempts = 0;
+            let randomSimilar = null;
+            while (attempts < 5 && !randomSimilar) {
+              const candidate = similar[Math.floor(Math.random() * similar.length)];
+              if (!recipeIds.has(candidate.id)) {
+                randomSimilar = candidate;
+              }
+              attempts++;
+            }
             
-            // Add it if we don't already have it, or add anyway if we're still short
-            if (!validRecipes.some(vr => vr.id === randomSimilar.id)) {
+            if (randomSimilar) {
               validRecipes.push(randomSimilar);
-            } else if (validRecipes.length < 5) {
-              // If we're short on recipes, add duplicates as fallback
-              validRecipes.push(randomSimilar);
+              recipeIds.add(randomSimilar.id);
             }
           }
         } catch (err) {
@@ -59,8 +65,9 @@
           // If all else fails, fetch a random recipe
           try {
             const random = await api.getRandomRecipe();
-            if (random) {
+            if (random && !recipeIds.has(random.id)) {
               validRecipes.push(random);
+              recipeIds.add(random.id);
             }
           } catch (e) {
             break;

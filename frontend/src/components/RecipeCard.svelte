@@ -32,7 +32,11 @@
   <div class="card-image-container">
     <img src={recipe.image} alt={recipe.name} class="card-image" />
     <button on:click={toggleFavorite} class="favorite-btn" title="Toggle favorite">
-      {isFavorited ? '❤️' : '🤍'}
+      {#if isFavorited}
+        <img src="/heartred.svg" alt="Favorited" class="heart-svg" />
+      {:else}
+        <img src="/heart.svg" alt="Favorite" class="heart-svg" />
+      {/if}
     </button>
   </div>
   <div class="card-content">
@@ -99,6 +103,11 @@
 
   .favorite-btn:hover {
     background: rgba(0, 0, 0, 0.7);
+  }
+
+  .heart-svg {
+    width: 24px;
+    height: 24px;
   }
 
   .card-content {

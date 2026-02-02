@@ -23,7 +23,7 @@
     on:input={handleInput}
     class="search-input"
   />
-  <span class="search-icon">🔍</span>
+  <img src="/search.svg" alt="Search" class="search-icon" />
 </div>
 
 <style>
@@ -58,5 +58,7 @@
     right: 1rem;
     font-size: 1.2rem;
     pointer-events: none;
+    width: 20px;
+    height: 20px;
   }
 </style>
