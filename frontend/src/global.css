@@ -1,0 +1,95 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: #3d2817;
+  color: #f5f1e8;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #3d2817;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: #f5f1e8;
+  margin-bottom: 1rem;
+}
+
+p {
+  color: #c9b8a8;
+}
+
+/* Buttons */
+button {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Links */
+a {
+  color: #d4a574;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: #e8c8a0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2a2015;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6b4d3d;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8b6d5d;
+}
+
+/* Page container */
+.page-container {
+  flex: 1;
+  padding: 1.5rem;
+  padding-bottom: 120px;
+  overflow-y: auto;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (max-width: 767px) {
+  .page-container {
+    padding: 1rem;
+    padding-bottom: 100px;
+  }
+}
+
+/* Responsive utilities */
+@media (min-width: 768px) {
+  .page-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "coco-monorepo",
+  "version": "1.0.0",
+  "description": "CoCo - Cooking Companion App",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ]
+}
