@@ -1,6 +1,6 @@
 <script>
   import { onMount, getContext } from 'svelte';
-  import { params } from '../stores/paramsStore.js';
+  import { params as routeParams } from '../stores/paramsStore.js';
   import Header from '../components/Header.svelte';
   import BottomNav from '../components/BottomNav.svelte';
   import SegmentedTabs from '../components/SegmentedTabs.svelte';
@@ -9,6 +9,8 @@
   import LoadingSpinner from '../components/LoadingSpinner.svelte';
   import { api } from '../lib/api.js';
   import { favoritesStore } from '../stores/favoritesStore.js';
+
+  export let params = {};
 
   const goto = getContext('goto');
   let recipe = null;
@@ -25,7 +27,7 @@
 
   onMount(async () => {
     try {
-      const recipeId = $params.id;
+      const recipeId = $routeParams.id;
       const data = await api.getRecipeById(recipeId);
       if (!data) {
         error = 'Recipe not found';
@@ -66,14 +68,7 @@
     }
   }
 
-  function getDifficultyEmoji(difficulty) {
-    switch (difficulty) {
-      case 'easy': return '🟢';
-      case 'medium': return '🟡';
-      case 'hard': return '🔴';
-      default: return '⚪';
-    }
-  }
+
 
   function handleCloseError() {
     error = '';
@@ -92,19 +87,23 @@
 
     <img src={recipe.image} alt={recipe.name} class="recipe-hero" />
 
-    <div class="recipe-header">
-      <h1>{recipe.name}</h1>
-      <p class="cuisine">{recipe.category} · {recipe.area}</p>
-    </div>
+    <div class="recipe-info-card">
+      <div class="recipe-header">
+        <h1>{recipe.name}</h1>
+        <p class="cuisine">{recipe.category} · {recipe.area}</p>
+      </div>
 
-    <p class="short-info">{recipe.shortInfo}</p>
+      <p class="short-info">{recipe.shortInfo}</p>
 
-    <div class="meta-row">
-      <span class="difficulty">{getDifficultyEmoji(recipe.difficulty)} {recipe.difficulty}</span>
-      <span class="time">🕐 {recipe.timeMinutes} min</span>
-      <button on:click={toggleFavorite} class="favorite-action" title="Toggle favorite">
-        {isFavorited ? '❤️ Saved' : '🤍 Save'}
-      </button>
+      <div class="meta-row">
+        <div class="meta-left">
+          <span class="difficulty"><img src="/diff.svg" alt="Difficulty" class="icon-small" /> {recipe.difficulty}</span>
+          <span class="time"><img src="/time.svg" alt="Time" class="icon-small" /> {recipe.timeMinutes} min</span>
+        </div>
+        <button on:click={toggleFavorite} class="favorite-action" title="Toggle favorite">
+          {isFavorited ? '❤️ Saved' : '🤍 Save'}
+        </button>
+      </div>
     </div>
 
     <SegmentedTabs
@@ -162,6 +161,14 @@
     margin-bottom: 1.5rem;
   }
 
+  .recipe-info-card {
+    padding: 1.5rem;
+    background: #1a1410;
+    border: 1px solid #6b4d3d;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
   .recipe-header {
     margin-bottom: 1rem;
   }
@@ -187,13 +194,29 @@
     display: flex;
     gap: 1.5rem;
     align-items: center;
+    justify-content: space-between;
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
   }
 
+  .meta-left {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
   .difficulty, .time {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
     font-size: 0.95rem;
     color: #a89878;
+  }
+
+  .icon-small {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
   }
 
   .favorite-action {

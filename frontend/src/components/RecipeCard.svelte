@@ -18,14 +18,7 @@
     }
   }
 
-  function getDifficultyEmoji(difficulty) {
-    switch (difficulty) {
-      case 'easy': return '🟢';
-      case 'medium': return '🟡';
-      case 'hard': return '🔴';
-      default: return '⚪';
-    }
-  }
+
 </script>
 
 <div class="recipe-card">
@@ -48,8 +41,8 @@
       <p class="short-info">{recipe.shortInfo}</p>
     {/if}
     <div class="meta">
-      <span class="difficulty">{getDifficultyEmoji(recipe.difficulty)} {recipe.difficulty}</span>
-      <span class="time">🕐 {recipe.timeMinutes} min</span>
+      <span class="difficulty"><img src="/diff.svg" alt="Difficulty" class="icon-small" /> {recipe.difficulty}</span>
+      <span class="time"><img src="/time.svg" alt="Time" class="icon-small" /> {recipe.timeMinutes} min</span>
     </div>
     <button on:click={() => goto(`/recipe/${recipe.id}`)} class="recipe-btn">
       Recipe →
@@ -165,6 +158,13 @@
     display: flex;
     align-items: center;
     gap: 0.25rem;
+  }
+
+  .icon-small {
+    width: 18px;
+    height: 18px;
+    display: inline-block;
+    vertical-align: middle;
   }
 
   .recipe-btn {
