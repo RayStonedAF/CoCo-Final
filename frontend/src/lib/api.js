@@ -30,15 +30,19 @@ export const api = {
   getRecipeById: (id) => fetchAPI(`/api/recipes/${id}`),
 
   // AI
-  generateRecipeSummary: (recipeName, category, area, ingredients, steps) =>
-    fetchAPI('/api/ai/recipe-summary', {
+  generateRecipeSummary: async (recipeName, category, area, ingredients, steps) => {
+    const response = await fetchAPI('/api/ai/recipe-summary', {
       method: 'POST',
       body: JSON.stringify({ recipeName, category, area, ingredients, steps })
-    }),
+    });
+    return response.text || '';
+  },
 
-  chatWithCoco: (messages, userName) =>
-    fetchAPI('/api/ai/chat', {
+  chatWithCoco: async (messages, userName) => {
+    const response = await fetchAPI('/api/ai/chat', {
       method: 'POST',
       body: JSON.stringify({ messages, userName })
-    })
+    });
+    return response.reply || '';
+  }
 };
