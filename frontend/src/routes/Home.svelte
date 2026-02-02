@@ -3,6 +3,7 @@
   import Header from '../components/Header.svelte';
   import BottomNav from '../components/BottomNav.svelte';
   import RecipeCard from '../components/RecipeCard.svelte';
+  import FavoriteRecipeThumb from '../components/FavoriteRecipeThumb.svelte';
   import ErrorBanner from '../components/ErrorBanner.svelte';
   import LoadingSpinner from '../components/LoadingSpinner.svelte';
   import { api } from '../lib/api.js';
@@ -14,7 +15,7 @@
   let loading = true;
   let error = '';
   let favorites = [];
-  let recommendedRecipes = [];
+  let favoriteRecipes = [];
 
   userStore.subscribe(user => {
     userName = user.name;
@@ -22,7 +23,25 @@
 
   favoritesStore.subscribe(fav => {
     favorites = fav;
+    loadFavoriteRecipes(fav);
   });
+
+  async function loadFavoriteRecipes(favIds) {
+    if (favIds.length === 0) {
+      favoriteRecipes = [];
+      return;
+    }
+
+    try {
+      // Fetch details for up to 3 favorite recipes
+      const recipePromises = favIds.slice(0, 3).map(id => api.getRecipeById(id));
+      const recipes = await Promise.all(recipePromises);
+      favoriteRecipes = recipes.filter(Boolean);
+    } catch (err) {
+      console.error('Error loading favorite recipes:', err);
+      favoriteRecipes = [];
+    }
+  }
 
   onMount(async () => {
     try {
@@ -50,9 +69,6 @@
       }
 
       randomRecipe = recipe;
-
-      // Load favorite recipes (simplified - just show placeholders)
-      recommendedRecipes = [];
       loading = false;
     } catch (err) {
       console.error('Error loading home:', err);
@@ -89,10 +105,8 @@
       <h2>Based on your favorites:</h2>
       {#if favorites.length > 0}
         <div class="favorites-preview">
-          {#each favorites.slice(0, 3) as favId}
-            <div class="favorite-chip">
-              <span>⭐ Recipe</span>
-            </div>
+          {#each favoriteRecipes as recipe (recipe.id)}
+            <FavoriteRecipeThumb {recipe} />
           {/each}
         </div>
       {:else}
@@ -131,19 +145,9 @@
 
   .favorites-preview {
     display: flex;
-    gap: 1rem;
+    gap: 1.5rem;
     overflow-x: auto;
     padding-bottom: 0.5rem;
-  }
-
-  .favorite-chip {
-    flex-shrink: 0;
-    padding: 1rem 1.5rem;
-    background: #1a1410;
-    border: 1px solid #6b4d3d;
-    border-radius: 0.75rem;
-    color: #d4a574;
-    text-align: center;
   }
 
   .empty-state {
