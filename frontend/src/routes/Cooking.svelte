@@ -16,6 +16,11 @@
   let error = '';
   let textToSpeech = false;
   let relevantIngredients = [];
+  
+  // Timer state
+  let timerSeconds = 0;
+  let timerRunning = false;
+  let timerInterval = null;
 
   userStore.subscribe(user => {
     textToSpeech = user.settings.textToSpeech;
@@ -72,6 +77,7 @@
   }
 
   function nextStep() {
+    stopTimer();
     if (currentStep < recipe.steps.length - 1) {
       currentStep++;
       updateRelevantIngredients();
@@ -86,6 +92,7 @@
   }
 
   function previousStep() {
+    stopTimer();
     if (currentStep > 0) {
       currentStep--;
       updateRelevantIngredients();
@@ -105,6 +112,48 @@
     error = '';
   }
 
+  function toggleTimer() {
+    if (timerRunning) {
+      stopTimer();
+    } else {
+      startTimer();
+    }
+  }
+
+  function startTimer() {
+    if (timerSeconds <= 0) {
+      timerSeconds = 300; // Default 5 minutes
+    }
+    timerRunning = true;
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      if (timerSeconds <= 0) {
+        stopTimer();
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    timerRunning = false;
+    clearInterval(timerInterval);
+  }
+
+  function addMinute() {
+    timerSeconds += 60;
+  }
+
+  function subtractMinute() {
+    if (timerSeconds >= 60) {
+      timerSeconds -= 60;
+    }
+  }
+
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
   const isLastStep = recipe && currentStep === recipe.steps.length - 1;
 </script>
 
@@ -118,42 +167,57 @@
   {:else if recipe}
     <button on:click={() => goto(`/recipe/${recipe.id}`)} class="back-btn">← Back</button>
 
-    <div class="ingredients-needed">
-      <h3>ingredients needed in this step</h3>
-      <div class="ingredients-columns">
-        <div class="col-left">
-          {#each relevantIngredients.slice(0, Math.ceil(relevantIngredients.length / 2)) as ing}
-            <p class="ingredient-item">{ing.name}</p>
-          {/each}
-        </div>
-        <div class="col-right">
-          {#each relevantIngredients.slice(Math.ceil(relevantIngredients.length / 2)) as ing}
-            <p class="ingredient-item">{ing.measure}</p>
-          {/each}
-        </div>
+    <div class="timer-section">
+      <div class="timer-display">
+        <span class="timer-time" class:running={timerRunning}>{formatTime(timerSeconds)}</span>
+      </div>
+      <div class="timer-controls">
+        <button on:click={subtractMinute} class="timer-btn" disabled={!timerRunning && timerSeconds === 0}>−</button>
+        <button on:click={toggleTimer} class="timer-btn main">
+          {timerRunning ? '⏸' : '▶'}
+        </button>
+        <button on:click={addMinute} class="timer-btn">+</button>
       </div>
     </div>
 
-    <div class="step-container">
-      <h2 class="step-title">
-        {isLastStep ? 'Final Step' : `Step ${currentStep + 1}`}
-      </h2>
-      <p class="step-text">{recipe.steps[currentStep]}</p>
-    </div>
+    <div class="content-wrapper">
+      <div class="ingredients-needed">
+        <h3>ingredients needed in this step</h3>
+        <div class="ingredients-columns">
+          <div class="col-left">
+            {#each relevantIngredients.slice(0, Math.ceil(relevantIngredients.length / 2)) as ing}
+              <p class="ingredient-item">{ing.name}</p>
+            {/each}
+          </div>
+          <div class="col-right">
+            {#each relevantIngredients.slice(Math.ceil(relevantIngredients.length / 2)) as ing}
+              <p class="ingredient-item">{ing.measure}</p>
+            {/each}
+          </div>
+        </div>
+      </div>
 
-    <div class="controls">
-      <button on:click={previousStep} class="btn prev-btn" disabled={currentStep === 0}>
-        Previous
-      </button>
-      {#if textToSpeech}
-        <button on:click={repeatStep} class="btn repeat-btn">🔊</button>
-      {/if}
-      <button
-        on:click={nextStep}
-        class="btn next-btn"
-      >
-        {isLastStep ? 'Finished' : 'Next'}
-      </button>
+      <div class="step-container">
+        <h2 class="step-title">
+          {isLastStep ? 'Final Step' : `Step ${currentStep + 1}`}
+        </h2>
+        <p class="step-text">{recipe.steps[currentStep]}</p>
+      </div>
+
+      <div class="controls">
+        <button on:click={previousStep} class="btn prev-btn" disabled={currentStep === 0}>
+          Previous
+        </button>
+        {#if textToSpeech}
+          <button on:click={repeatStep} class="btn repeat-btn">🔊</button>
+        {/if}
+        <button
+          on:click={nextStep}
+          class="btn next-btn"
+        >
+          {isLastStep ? 'Finished' : 'Next'}
+        </button>
+      </div>
     </div>
   {/if}
 </div>
@@ -180,6 +244,83 @@
 
   .back-btn:hover {
     color: #e8c8a0;
+  }
+
+  .timer-section {
+    background: #1a1410;
+    border: 1px solid #6b4d3d;
+    border-radius: 1rem;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .timer-display {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #d4a574;
+    font-family: 'Courier New', monospace;
+    min-width: 150px;
+    text-align: center;
+  }
+
+  .timer-time.running {
+    color: #f5a623;
+    animation: pulse-timer 1s infinite;
+  }
+
+  @keyframes pulse-timer {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .timer-controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .timer-btn {
+    width: 44px;
+    height: 44px;
+    border: 1px solid #6b4d3d;
+    border-radius: 0.5rem;
+    background: #2a2015;
+    color: #d4a574;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .timer-btn:hover:not(:disabled) {
+    background: #3a2f1a;
+    border-color: #d4a574;
+  }
+
+  .timer-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .timer-btn.main {
+    width: 56px;
+    background: #d4a574;
+    color: #2a2015;
+    font-weight: bold;
+  }
+
+  .timer-btn.main:hover:not(:disabled) {
+    background: #e8c8a0;
+  }
+
+  .content-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.5rem;
+    flex: 1;
+    min-height: 400px;
   }
 
   .ingredients-needed {
@@ -216,6 +357,9 @@
     border: 1px solid #6b4d3d;
     border-radius: 1rem;
     padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .step-title {

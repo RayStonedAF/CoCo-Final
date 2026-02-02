@@ -1,6 +1,7 @@
 <script>
   import { getContext } from 'svelte';
   import { userStore } from '../stores/userStore';
+  import profileIcon from '../assets/profile.svg';
 
   const goto = getContext('goto');
   let userName = 'Ray';
@@ -20,7 +21,7 @@
       <img src="/search.svg" alt="Search" class="icon-svg" />
     </button>
     <button on:click={() => goto('/profile')} class="icon-button" title="Profile">
-      👤
+      <img src={profileIcon} alt="Profile" class="icon-svg" />
     </button>
   </div>
 </header>

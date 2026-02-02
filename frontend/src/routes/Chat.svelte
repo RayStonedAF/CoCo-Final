@@ -6,6 +6,7 @@
   import ErrorBanner from '../components/ErrorBanner.svelte';
   import { api } from '../lib/api.js';
   import { userStore } from '../stores/userStore.js';
+  import micIcon from '../assets/mic.svg';
 
   const goto = getContext('goto');
   let messages = [];
@@ -151,7 +152,7 @@
           title="Voice input"
           disabled={loading || listeningForVoice}
         >
-          🎤
+          <img src={micIcon} alt="microphone" class="mic-icon" />
         </button>
       </div>
       <button
@@ -242,7 +243,9 @@
     font-family: inherit;
     font-size: 0.95rem;
     resize: none;
-    max-height: 80px;
+    height: 56px;
+    display: flex;
+    align-items: center;
   }
 
   .chat-input:focus {
@@ -255,16 +258,24 @@
   }
 
   .voice-btn {
-    width: 44px;
-    height: auto;
-    padding: 0.75rem;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    padding: 0;
     background: #d4a574;
     border: none;
-    border-radius: 0.5rem;
-    font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.2s;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mic-icon {
+    width: 28px;
+    height: 28px;
+    color: #2a2015;
   }
 
   .voice-btn:hover:not(:disabled) {
