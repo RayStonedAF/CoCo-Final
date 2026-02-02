@@ -27,16 +27,48 @@
   });
 
   async function loadFavoriteRecipes(favIds) {
-    if (favIds.length === 0) {
-      favoriteRecipes = [];
-      return;
-    }
-
     try {
-      // Fetch details for up to 3 favorite recipes
-      const recipePromises = favIds.slice(0, 3).map(id => api.getRecipeById(id));
+      // Fetch actual favorite recipes
+      const recipesToFetch = favIds.slice(0, 5);
+      const recipePromises = recipesToFetch.map(id => api.getRecipeById(id));
       const recipes = await Promise.all(recipePromises);
-      favoriteRecipes = recipes.filter(Boolean);
+      const validRecipes = recipes.filter(Boolean);
+
+      // Generate recommendations until we have exactly 5
+      while (validRecipes.length < 5) {
+        try {
+          // Pick a random favorite to base the recommendation on
+          const baseFavorite = validRecipes[Math.floor(Math.random() * validRecipes.length)];
+          
+          // Search for similar recipes by category
+          const similar = await api.searchRecipes(baseFavorite.category);
+          if (similar && similar.length > 0) {
+            // Pick a random similar recipe
+            const randomSimilar = similar[Math.floor(Math.random() * similar.length)];
+            
+            // Add it if we don't already have it, or add anyway if we're still short
+            if (!validRecipes.some(vr => vr.id === randomSimilar.id)) {
+              validRecipes.push(randomSimilar);
+            } else if (validRecipes.length < 5) {
+              // If we're short on recipes, add duplicates as fallback
+              validRecipes.push(randomSimilar);
+            }
+          }
+        } catch (err) {
+          console.error('Error generating recommendation:', err);
+          // If all else fails, fetch a random recipe
+          try {
+            const random = await api.getRandomRecipe();
+            if (random) {
+              validRecipes.push(random);
+            }
+          } catch (e) {
+            break;
+          }
+        }
+      }
+
+      favoriteRecipes = validRecipes.slice(0, 5);
     } catch (err) {
       console.error('Error loading favorite recipes:', err);
       favoriteRecipes = [];
@@ -148,6 +180,25 @@
     gap: 1.5rem;
     overflow-x: auto;
     padding-bottom: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: #6b4d3d #1a1410;
+  }
+
+  .favorites-preview::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .favorites-preview::-webkit-scrollbar-track {
+    background: #1a1410;
+  }
+
+  .favorites-preview::-webkit-scrollbar-thumb {
+    background: #6b4d3d;
+    border-radius: 3px;
+  }
+
+  .favorites-preview::-webkit-scrollbar-thumb:hover {
+    background: #a89878;
   }
 
   .empty-state {
